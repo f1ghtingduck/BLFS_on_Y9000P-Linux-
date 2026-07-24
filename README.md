@@ -1,10 +1,14 @@
 # MyLinux — 从零构建个人 Linux 操作系统
+参考项目：LFS/BLFS
 
 基于 Alpine Linux 3.21、Linux Kernel 7.2.0-rc3+、Xfce 桌面，
 从内核编译到 U 盘启动，完整可复现的个人 Linux 构建工程。
 
 ## 硬件配置
-
+⚠️ Disclaimer
+The kernel configurations in this project are deeply customized for the Lenovo Legion Y9000P (2023).
+For other laptop models, these configs should only be used as a reference.
+Always review and adjust kernel options based on your specific hardware.
 | 组件 | 型号 |
 |------|------|
 | CPU | Intel Core i9-13900HX (13th Gen Raptor Lake) |
@@ -117,14 +121,6 @@ UEFI → FAT32:BOOTX64.EFI(GRUB) → search UUID → ext4:/boot/vmlinuz
 ```
 
 ## 致谢
-
-- Alpine Linux
 - Linux From Scratch / BLFS
-- Busybox
-- Linux Kernel
 
-## ⚠️ Disclaimer
 
-The kernel configurations in this project are deeply customized for the Lenovo Legion Y9000P (2023).
-For other laptop models, these configs should only be used as a reference.
-Always review and adjust kernel options based on your specific hardware.
