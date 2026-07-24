@@ -1,0 +1,30 @@
+#!/bin/sh
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+echo "=== v17 ==="
+mkdir -p /new_root
+
+flush() {
+    cp /rcS.alpine /new_root/etc/init.d/rcS
+    cp /net.sh /new_root/etc/init.d/net
+    mkdir -p /new_root/etc/X11
+    cp /xorg.conf /new_root/etc/X11/xorg.conf
+    cp /inittab.alpine /new_root/etc/inittab
+    cp /repositories /new_root/etc/apk/repositories
+    chmod 755 /new_root/root
+    cp /xinitrc /new_root/root/.xinitrc
+    sync
+}
+
+mount -t ext4 /dev/vda /new_root 2>/dev/null && { flush; exec switch_root /new_root /sbin/init; }
+
+sleep 5
+ROOTDEV=$(findfs PARTUUID=80dfe0da-e6fe-41e4-9b79-3ced2dce3994 2>/dev/null)
+[ -n "$ROOTDEV" ] && mount -t ext4 $ROOTDEV /new_root 2>/dev/null && { flush; exec switch_root /new_root /sbin/init; }
+
+for dev in sdc2 sdb2 sda2 sdd2 nvme0n1p2 nvme1n1p2 vda; do
+    mount -t ext4 /dev/$dev /new_root 2>/dev/null && { flush; exec switch_root /new_root /sbin/init; }
+done
+
+exec /bin/sh

@@ -1,0 +1,79 @@
+# 内核编译依赖关系
+
+## initramfs /init 依赖的内核选项
+BINFMT_SCRIPT=y          # 支持 #!/bin/sh shebang
+DEVTMPFS=y               # /dev 自动节点
+PROC_FS=y                # /proc
+SYSFS=y                  # /sys
+TMPFS=y                  # tmpfs（initramfs 载体）
+
+## 存储设备驱动链
+BLOCK=y → PCI=y → SCSI=y → BLK_DEV_SD=y → USB_STORAGE=y
+         ↓
+    VIRTIO_PCI=y → VIRTIO_BLK=y (QEMU)
+         ↓
+    SATA_AHCI=y → ATA_PIIX=y (QEMU IDE)
+         ↓
+    BLK_DEV_NVME=y (实体机 NVMe)
+
+## 文件系统
+EXT4_FS=y                # 根文件系统（必须）
+FAT_FS=y                 # FAT32 EFI 分区（必须用于 GRUB 读文件）
+VFAT_FS=y                # VFAT 支持
+
+## USB 设备链
+USB_SUPPORT=y → USB=y → USB_XHCI_HCD=y → USB_XHCI_PCI=y
+                         → USB_STORAGE=y
+                         → USB_HID=y → HID_GENERIC=y
+
+## 网络栈
+NET=y → INET=y → PACKET=y → UNIX=y
+     → E1000=y (QEMU)
+     → USB_USBNET=y → USB_NET_RNDIS_HOST=y (Android 共享)
+                    → USB_NET_CDCETHER=y (iPhone 共享)
+                    → USB_NET_CDC_NCM=y
+
+## 显示/GPU (i915)
+DRM=y → DRM_I915=y
+     → DRM_FBDEV_EMULATION=y
+     → FB=y
+     → FRAMEBUFFER_CONSOLE=y
+     → FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER=y  # 避免 logo 卡死
+     → X86_PAT=y ← MTRR=y                       # GPU 内存管理（必须）
+
+## 固件加载
+FW_LOADER=y → FW_LOADER_COMPRESS=y → FW_LOADER_COMPRESS_ZSTD=y
+
+## 输入设备
+INPUT=y → INPUT_EVDEV=y → INPUT_MOUSE=y → INPUT_TABLET=y
+       → MOUSE_PS2=y → SERIO=y → SERIO_I8042=y
+
+## 内核特性（用户态依赖）
+FUTEX=y → EPOLL=y → SIGNALFD=y → TIMERFD=y
+FILE_LOCKING=y           # apk 包管理需要
+MULTIUSER=y              # Xorg 需要
+UNIX98_PTYS=y            # 终端需要
+INOTIFY_USER=y           # eudev 需要
+
+## 启动
+EFI=y → EFI_STUB=y
+ACPI=y                   # 现代笔记本必须
+
+## 未启用（可选优化）
+CONFIG_MODULES=n         # 全内置，不需要模块
+CONFIG_SOUND=n           # 暂不支持音频
+CONFIG_PM=n              # 暂不支持休眠
+CONFIG_CPU_FREQ=n        # 暂不支持频率调节
+CONFIG_DRM_NOUVEAU=n     # 禁用（防与 i915 冲突）
+
+## rootfs 包依赖（Alpine apk）
+桌面:
+  xorg-server → xinit → xf86-input-libinput
+  xfce4 → xfce4-terminal, xfwm4, xfdesktop, xfce4-panel
+字体/图标:
+  ttf-dejavu → adwaita-icon-theme
+GPU:
+  linux-firmware-i915 (GuC/DMC 固件)
+  mesa-dri-gallium (crocus/iris DRI)
+设备:
+  eudev → pciutils

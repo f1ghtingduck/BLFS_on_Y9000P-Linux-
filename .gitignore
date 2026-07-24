@@ -1,0 +1,4 @@
+*.tar.gz
+rootfs.img
+backup/mylinux_backup_*
+backup/*.tar.gz
