@@ -45,6 +45,20 @@ linux-build/
     └── README.md          # 备份说明
 ```
 
+## 构建指南（分步骤）
+
+| 阶段 | 文件 | 内容 |
+|------|------|------|
+| ① initramfs | [01-initramfs.md](guides/01-initramfs.md) | busybox 编译 + /init 脚本 + cpio 打包 |
+| ② 内核 | [02-kernel.md](guides/02-kernel.md) | 内核配置 + 编译 + QEMU 测试 |
+| ③ rootfs | [03-rootfs.md](guides/03-rootfs.md) | Alpine minirootfs + apk 包管理 |
+| ④ 网络 | [04-network.md](guides/04-network.md) | USB 手机共享网 + QEMU 网络 |
+| ⑤ 桌面 | [05-desktop.md](guides/05-desktop.md) | Xfce 安装 + 配置 + 踩坑 10 条 |
+| ⑥ U 盘 | [06-usb-boot.md](guides/06-usb-boot.md) | FAT32+ext4 分区 + GRUB UEFI |
+| ⑦ GPU | [07-gpu-fix.md](guides/07-gpu-fix.md) | i915 显示修复 + PAT + 固件 |
+
+每个指南末尾附 ⚠️ 踩坑提醒。
+
 ## 系统组件
 
 | 组件 | 选择 | 说明 |
